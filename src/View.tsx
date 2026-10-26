@@ -44,6 +44,9 @@ export const View = memo(({ path }: Props) => {
       crs: L.CRS.Simple, preferCanvas: true,
       zoomControl: false, attributionControl: false, doubleClickZoom: false,
       keyboard: false, zoomSnap: 0.3, zoomDelta: 0.3, wheelPxPerZoomLevel: 360,
+      // Image changes must be immediate: no Leaflet zoom-slide or image fade.
+      // Keep image pre-decoding and the existing map instance unchanged.
+      zoomAnimation: false, fadeAnimation: false,
     }).setView([0, 0], 0, { animate: false });
     map.current = instance;
     instance.on("dblclick", () => {

@@ -10,7 +10,7 @@ test("Tauri config and security", () => {
  assert.ok(config.bundle.fileAssociations[0].ext.includes("png"));
  assert.ok(!read("src-tauri/capabilities/default.json").includes("fs:write-all"));
 });
-test("Bottom toolbar only reveals at bottom edge and stays accessible", () => {
+test("Bottom toolbar reveals sooner and stays accessible", () => {
  const css = read("src/ToolBar.scss");
  const app = read("src/App.tsx");
  const bar = read("src/ToolBar.tsx");
@@ -19,8 +19,8 @@ test("Bottom toolbar only reveals at bottom edge and stays accessible", () => {
  assert.match(css, /\.bottom:has\(\.icon:focus-visible\) \.toolbar/);
  assert.doesNotMatch(css, /\.bottom:focus-within/);
  assert.doesNotMatch(css, /\.bottom:hover \.toolbar/);
- assert.match(app, /distance <= 16/);
- assert.match(app, /wasVisible && distance <= 100/);
+ assert.match(app, /distance <= 64/);
+ assert.match(app, /wasVisible && distance <= 128/);
  assert.match(app, /window\.addEventListener\("pointermove", onMove/);
  assert.match(bar, /data-visible=\{props\.visible/);
 });

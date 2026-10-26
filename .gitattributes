@@ -1,0 +1,2 @@
+# Keep Windows launchers as original CRLF without BOM
+*.cmd -text

@@ -17,6 +17,7 @@
         "title": "LeafView Custom — Tauri Edition",
         "width": 900,
         "height": 600,
+        "maximized": true,
         "minWidth": 640,
         "minHeight": 420,
         "backgroundColor": "#17181c",

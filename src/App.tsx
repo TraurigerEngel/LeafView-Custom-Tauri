@@ -58,16 +58,16 @@ export const App = () => {
     return () => { alive = false; offOpen?.(); offDrop?.(); };
   }, [showImage]);
 
-  // Open the toolbar only at the very edge (16px). Once opened, keep it
-  // available while the pointer travels up to its buttons. Moving away from
-  // the bottom 100px dismisses it. Pointer events are observed globally so
+  // Reveal the toolbar on approach to the bottom 64px (instead of 16px).
+  // Keep it visible within the bottom 128px so the cursor can reach every
+  // button without making the panel flicker. Observe pointer moves globally so
   // Leaflet's pan/drag event handling cannot accidentally suppress them.
   useEffect(() => {
     const onMove = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
       const distance = window.innerHeight - event.clientY;
       setToolbarVisible(wasVisible => distance >= 0 &&
-        (distance <= 16 || (wasVisible && distance <= 100)));
+        (distance <= 64 || (wasVisible && distance <= 128)));
     };
     const hide = () => setToolbarVisible(false);
     window.addEventListener("pointermove", onMove, { passive: true });
