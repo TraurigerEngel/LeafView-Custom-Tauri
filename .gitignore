@@ -1,0 +1,27 @@
+# Dependencies and generated frontend assets
+node_modules/
+dist/
+
+# Tauri generated files and builds
+src-tauri/target/
+src-tauri/gen/
+
+# Local patches, backups and releases
+update-backups/
+release-artifacts/
+*.log
+*.zip
+*.exe
+*.msi
+
+# OS / IDE / secrets
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem

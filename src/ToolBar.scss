@@ -1,0 +1,112 @@
+@mixin Icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  fill: rgb(199, 199, 204);
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  padding: 0;
+  transition: background-color 120ms ease;
+  &:hover:not(:disabled) { background: rgb(255 255 255 / 10%); }
+  &:focus-visible { outline: 2px solid #93a8ff; outline-offset: -2px; }
+  &:disabled { opacity: 0.32; cursor: default; }
+  &:hover {
+    cursor: pointer;
+  }
+  &:active {
+    fill: rgb(255, 255, 255);
+  }
+}
+
+.container {
+  .bottom {
+    position: absolute;
+    bottom: 0;
+    z-index: 20;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .folder {
+      position: absolute;
+      left: 16px;
+      display: flex;
+      height: 60px;
+      align-items: center;
+      padding: 0 6px;
+      border-radius: 30px;
+      background-color: rgba(0, 0, 0, 0.7);
+      user-select: none;
+      .icon {
+        @include Icon();
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      height: 60px;
+      align-items: center;
+      padding: 0 24px;
+      border-radius: 30px;
+      background-color: rgba(0, 0, 0, 0.7);
+      user-select: none;
+
+      .grid {
+        width: 70px;
+        display: flex;
+        justify-content: flex-start;
+        .icon {
+          @include Icon();
+        }
+      }
+
+      .arrows {
+        display: flex;
+        .icon {
+          @include Icon();
+        }
+      }
+
+      .trash {
+        width: 70px;
+        display: flex;
+        justify-content: flex-end;
+        .icon {
+          @include Icon();
+        }
+      }
+    }
+  }
+}
+
+/* Preview 2: the panel is initially invisible and cannot intercept image clicks.
+   The application reveals it only after the pointer reaches the final 16px.
+   The extended 100px dismissal region makes reaching a button comfortable. */
+.container .bottom {
+  opacity: 1;
+  pointer-events: none;
+}
+.container .bottom .folder,
+.container .bottom .toolbar {
+  opacity: 0;
+  transform: translateY(18px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.container .bottom[data-visible="true"] .folder,
+.container .bottom[data-visible="true"] .toolbar,
+.container .bottom:has(.icon:focus-visible) .folder,
+.container .bottom:has(.icon:focus-visible) .toolbar {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .container .bottom .folder, .container .bottom .toolbar { transition: none; }
+}

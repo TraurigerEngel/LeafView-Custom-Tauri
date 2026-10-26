@@ -1,0 +1,23 @@
+[package]
+name = "leafview-custom-tauri"
+version = "0.1.2"
+description = "Unofficial LeafView Custom Tauri preview"
+authors = ["LeafView Custom contributors"]
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "leafview_custom_tauri_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+dunce = "1"
+natord = "1"
+trash = "5"
