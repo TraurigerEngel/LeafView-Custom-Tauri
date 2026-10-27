@@ -49,7 +49,10 @@ test("Arrow navigation stops at boundaries without rescanning", () => {
 });
 test("Protected trash + native drop + single-instance arguments", () => {
  const app = read("src/App.tsx");
- assert.ok(app.indexOf("await ask(") < app.indexOf("await moveToTrash("));
+ assert.ok(app.indexOf("await confirmDelete(") < app.indexOf("await moveToTrash("));
+ assert.match(app, /role="alertdialog"/);
+ assert.match(app, /answerDelete\(true\)/);
+ assert.doesNotMatch(app, /await ask\(/);
  assert.match(app, /\.onDragDropEvent/);
  const rust = read("src-tauri/src/lib.rs");
  assert.match(rust, /tauri_plugin_single_instance::init/);

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { ask, message, open } from "@tauri-apps/plugin-dialog";
+import { message, open } from "@tauri-apps/plugin-dialog";
 import i18next from "i18next";
 import { Grid } from "./Grid";
 import { ToolBar } from "./ToolBar";
@@ -21,6 +21,31 @@ export const App = () => {
   const filesRef = useRef<string[]>([]);
   const openedSeq = useRef(0);
   const deleting = useRef(false);
+  // Native warning dialogs play a Windows system alert sound. Keep the
+  // safety confirmation in LeafView instead, without changing Windows sounds.
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const confirmResolver = useRef<((accepted: boolean) => void) | null>(null);
+  const cancelDeleteButton = useRef<HTMLButtonElement>(null);
+  const confirmDeleteButton = useRef<HTMLButtonElement>(null);
+  const confirmDelete = useCallback((name: string): Promise<boolean> =>
+    new Promise(resolve => {
+      confirmResolver.current = resolve;
+      setDeleteConfirm(name);
+    }), []);
+  const answerDelete = useCallback((accepted: boolean) => {
+    const resolve = confirmResolver.current;
+    confirmResolver.current = null;
+    setDeleteConfirm(null);
+    resolve?.(accepted);
+  }, []);
+  useEffect(() => {
+    // Enter activates the focused Move to Trash button; Cancel remains reachable by Tab.
+    if (deleteConfirm !== null) confirmDeleteButton.current?.focus();
+  }, [deleteConfirm]);
+  useEffect(() => () => {
+    confirmResolver.current?.(false);
+    confirmResolver.current = null;
+  }, []);
 
   const apply = useCallback((value: string, items: string[]) => {
     pathRef.current = value; filesRef.current = items;
@@ -123,9 +148,7 @@ export const App = () => {
     if (!current || deleting.current) return;
     deleting.current = true;
     try {
-      const yes = await ask(`Переместить «${fileName(current)}» в корзину?`, {
-        title: "Удаление изображения", kind: "warning", okLabel: "В корзину", cancelLabel: "Отмена",
-      });
+      const yes = await confirmDelete(fileName(current));
       if (!yes) return;
       const removed = await moveToTrash(current);
       if (!removed) return;
@@ -141,7 +164,7 @@ export const App = () => {
       setError(description);
       void message(description, { title: "LeafView Custom", kind: "error" });
     } finally { deleting.current = false; }
-  }, [apply]);
+  }, [apply, confirmDelete]);
 
   const toggleGrid = useCallback(async () => { if (pathRef.current) setGrid(v => !v); }, []);
   const selectThumb = useCallback((item: string) => {
@@ -156,6 +179,11 @@ export const App = () => {
       if (e.key === "Escape") {
         e.preventDefault(); e.stopPropagation();
         if (!e.repeat) void getCurrentWindow().close().catch(console.error);
+        return;
+      }
+      // Do not let viewer hotkeys change the current image behind a confirmation.
+      if (confirmResolver.current) {
+        if (!["Tab", "Enter", " "].includes(e.key)) { e.preventDefault(); e.stopPropagation(); }
         return;
       }
       if (e.altKey || e.metaKey || node?.matches("input, textarea, select, [contenteditable=true]")) return;
@@ -210,6 +238,24 @@ export const App = () => {
       <button disabled={!path} onClick={() => {setContext(null);void toggleGrid();}}>Миниатюры <span>H</span></button>
       <div className="context-separator"/>
       <button disabled={!path} onClick={() => {setContext(null);void doDelete();}}>Переместить в корзину <span>Del</span></button>
+    </div>}
+    {deleteConfirm !== null && <div className="delete-dialog-backdrop">
+      <section className="delete-dialog" role="alertdialog" aria-modal="true"
+        aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-text"
+        onKeyDown={event => {
+          if (event.key !== "Tab") return;
+          event.preventDefault();
+          (document.activeElement === confirmDeleteButton.current
+            ? cancelDeleteButton.current
+            : confirmDeleteButton.current)?.focus();
+        }}>
+        <h2 id="delete-dialog-title">Удаление изображения</h2>
+        <p id="delete-dialog-text">Переместить «{deleteConfirm}» в корзину?</p>
+        <div className="delete-dialog-actions">
+          <button type="button" ref={cancelDeleteButton} onClick={() => answerDelete(false)}>Отмена</button>
+          <button type="button" className="delete-dialog-confirm" ref={confirmDeleteButton} onClick={() => answerDelete(true)}>В корзину</button>
+        </div>
+      </section>
     </div>}
     {error && <div className="error-toast" role="alert" onClick={() => setError("")}>{error} <span>×</span></div>}
   </div>;

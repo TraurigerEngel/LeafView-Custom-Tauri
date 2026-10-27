@@ -17,8 +17,8 @@ test("HF5: lower toolbar appears earlier and stays reachable", () => {
 test("HF5: image replacement is instantaneous, without Leaflet fade or zoom-slide", () => {
   const view = read("src/View.tsx");
   assert.match(view, /zoomAnimation: false, fadeAnimation: false/);
-  assert.match(view, /fitBounds\(bounds, \{ animate: false \}\)/);
-  assert.match(view, /instance\.setView\([^;]*\{ animate: false \}\)/s);
+  assert.doesNotMatch(view, /instance\.fitBounds\(/);
+  assert.match(view, /instance\.setView\(\[0, 0\], 0, \{ animate: false \}\)/);
   assert.ok(view.indexOf("await requested.decode()") < view.indexOf("layer.addTo(instance)"));
   assert.ok(view.indexOf("layer.addTo(instance)") < view.indexOf("old?.layer.remove()"));
   assert.equal((view.match(/L\.map\(node,/g) || []).length, 1);

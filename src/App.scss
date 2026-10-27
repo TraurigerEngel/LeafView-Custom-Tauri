@@ -69,3 +69,29 @@ body, html, #root { margin:0; height:100%; overflow:hidden; }
 .container .view.init {
   pointer-events: none;
 }
+
+/* HF7: in-app, silent confirmation; never changes Windows sound settings. */
+.delete-dialog-backdrop {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; box-sizing: border-box;
+  background: rgb(0 0 0 / 64%);
+  font: 14px/1.45 system-ui, 'Segoe UI', sans-serif;
+}
+.delete-dialog {
+  width: min(100%, 400px); padding: 22px 24px 20px;
+  background: #292a31; border: 1px solid #555662; border-radius: 14px;
+  box-shadow: 0 18px 55px #000b; color: #f4f4f6;
+}
+.delete-dialog h2 { margin: 0 0 12px; font-size: 17px; font-weight: 600; }
+.delete-dialog p { margin: 0 0 24px; overflow-wrap: anywhere; color: #d1d2d9; }
+.delete-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.delete-dialog-actions button {
+  appearance: none; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  background: #40414a; border: 1px solid #646572; color: #f6f6f8;
+  font: 13px system-ui, 'Segoe UI', sans-serif;
+}
+.delete-dialog-actions button:hover { background: #52535f; }
+.delete-dialog-actions button:focus-visible { outline: 2px solid #a8b3f4; outline-offset: 2px; }
+.delete-dialog-actions .delete-dialog-confirm { background: #813a47; border-color: #a15563; }
+.delete-dialog-actions .delete-dialog-confirm:hover { background: #9b4656; }
